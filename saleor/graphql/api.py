@@ -38,20 +38,22 @@ from .order.mutations.orders import (
 from .page.resolvers import resolve_pages, resolve_page
 from .page.types import Page
 from .page.mutations import PageCreate, PageDelete, PageUpdate
+from .payment.types import Payment
+from .payment.resolvers import resolve_payments, resolve_payment_client_token
+from .payment.mutations import CompleteCheckoutWithCreditCard
 from .product.filters import ProductFilterSet
 from .product.mutations.attributes import (
     AttributeValueCreate, AttributeValueDelete,
     AttributeValueUpdate, AttributeCreate, AttributeDelete,
     AttributeUpdate)
 from .product.mutations.products import (
-    CategoryCreate, CategoryDelete, CategoryUpdate,
-    CollectionAddProducts, CollectionCreate, CollectionDelete,
-    CollectionRemoveProducts, CollectionUpdate, ProductCreate,
-    ProductDelete, ProductUpdate, ProductTypeCreate,
-    ProductTypeDelete, ProductImageCreate, ProductImageDelete,
-    ProductImageReorder, ProductImageUpdate, ProductTypeUpdate,
-    ProductVariantCreate, ProductVariantDelete,
-    ProductVariantUpdate, VariantImageAssign, VariantImageUnassign)
+    CategoryCreate, CategoryDelete, CategoryUpdate, CollectionAddProducts,
+    CollectionCreate, CollectionDelete, CollectionRemoveProducts,
+    CollectionUpdate, ProductCreate, ProductDelete, ProductUpdate,
+    ProductTypeCreate, ProductTypeDelete, ProductImageCreate,
+    ProductImageDelete, ProductImageReorder, ProductImageUpdate,
+    ProductTypeUpdate, ProductVariantCreate, ProductVariantDelete,
+    ProductVariantUpdate)
 from .product.resolvers import (
     resolve_attributes, resolve_categories, resolve_collections,
     resolve_products, resolve_product_types, resolve_product_variants)
@@ -85,34 +87,41 @@ class Query(graphene.ObjectType):
         level=graphene.Argument(graphene.Int),
         description='List of the shop\'s categories.')
     category = graphene.Field(
-        Category, id=graphene.Argument(graphene.ID),
+        Category,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a category by ID.')
     collection = graphene.Field(
-        Collection, id=graphene.Argument(graphene.ID),
+        Collection,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a collection by ID.')
     collections = DjangoFilterConnectionField(
-        Collection, query=graphene.String(
-            description=DESCRIPTIONS['collection']),
+        Collection,
+        query=graphene.String(description=DESCRIPTIONS['collection']),
         description='List of the shop\'s collections.')
     menu = graphene.Field(
         Menu, id=graphene.Argument(graphene.ID),
         name=graphene.Argument(graphene.String, description="Menu name."),
         description='Lookup a menu by ID or name.')
     menus = DjangoFilterConnectionField(
-        Menu, query=graphene.String(description=DESCRIPTIONS['menu']),
+        Menu,
+        query=graphene.String(description=DESCRIPTIONS['menu']),
         description="List of the shop\'s menus.")
     menu_item = graphene.Field(
-        MenuItem, id=graphene.Argument(graphene.ID),
+        MenuItem,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a menu item by ID.')
     menu_items = DjangoFilterConnectionField(
-        MenuItem, query=graphene.String(description=DESCRIPTIONS['menu_item']),
+        MenuItem,
+        query=graphene.String(description=DESCRIPTIONS['menu_item']),
         description='List of the shop\'s menu items.')
     order = graphene.Field(
-        Order, description='Lookup an order by ID.',
+        Order,
+        description='Lookup an order by ID.',
         id=graphene.Argument(graphene.ID))
     orders = DjangoFilterConnectionField(
-        Order, filterset_class=OrderFilter, query=graphene.String(
-            description=DESCRIPTIONS['order']),
+        Order,
+        filterset_class=OrderFilter,
+        query=graphene.String(description=DESCRIPTIONS['order']),
         description='List of the shop\'s orders.')
     page = graphene.Field(
         Page, id=graphene.Argument(graphene.ID), slug=graphene.String(),
@@ -121,36 +130,50 @@ class Query(graphene.ObjectType):
         Page, query=graphene.String(
             description=DESCRIPTIONS['page']),
         description='List of the shop\'s pages.')
+    payment = graphene.Field(Payment, id=graphene.Argument(graphene.ID))
+    payment_client_token = graphene.Field(
+        graphene.String, customer_id=graphene.String(description=''))
+    payments = DjangoFilterConnectionField(
+        Payment,
+        description='List of payments')
     product = graphene.Field(
-        Product, id=graphene.Argument(graphene.ID),
+        Product,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a product by ID.')
     products = DjangoFilterConnectionField(
-        Product, filterset_class=ProductFilterSet, query=graphene.String(
-            description=DESCRIPTIONS['product']),
+        Product,
+        filterset_class=ProductFilterSet,
+        query=graphene.String(description=DESCRIPTIONS['product']),
         description='List of the shop\'s products.')
     product_type = graphene.Field(
-        ProductType, id=graphene.Argument(graphene.ID),
+        ProductType,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a product type by ID.')
     product_types = DjangoFilterConnectionField(
         ProductType, description='List of the shop\'s product types.')
     product_variant = graphene.Field(
-        ProductVariant, id=graphene.Argument(graphene.ID),
+        ProductVariant,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a variant by ID.')
     product_variants = DjangoFilterConnectionField(
         ProductVariant, ids=graphene.List(graphene.ID),
         description='Lookup multiple variants by ID')
     sale = graphene.Field(
-        Sale, id=graphene.Argument(graphene.ID),
+        Sale,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a sale by ID.')
     sales = DjangoFilterConnectionField(
-        Sale, query=graphene.String(description=DESCRIPTIONS['sale']),
+        Sale,
+        query=graphene.String(description=DESCRIPTIONS['sale']),
         description="List of the shop\'s sales.")
     shop = graphene.Field(Shop, description='Represents a shop resources.')
     voucher = graphene.Field(
-        Voucher, id=graphene.Argument(graphene.ID),
+        Voucher,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a voucher by ID.')
     vouchers = DjangoFilterConnectionField(
-        Voucher, query=graphene.String(description=DESCRIPTIONS['product']),
+        Voucher,
+        query=graphene.String(description=DESCRIPTIONS['product']),
         description="List of the shop\'s vouchers.")
     shipping_zone = graphene.Field(
         ShippingZone, id=graphene.Argument(graphene.ID),
@@ -158,12 +181,12 @@ class Query(graphene.ObjectType):
     shipping_zones = DjangoFilterConnectionField(
         ShippingZone, description='List of the shop\'s shipping zones.')
     user = graphene.Field(
-        User, id=graphene.Argument(graphene.ID),
+        User,
+        id=graphene.Argument(graphene.ID),
         description='Lookup an user by ID.')
     customers = DjangoFilterConnectionField(
         User, description='List of the shop\'s users.',
-        query=graphene.String(
-            description=DESCRIPTIONS['user']))
+        query=graphene.String(description=DESCRIPTIONS['user']))
     staff_users = DjangoFilterConnectionField(
         User, description='List of the shop\'s staff users.',
         query=graphene.String(description=DESCRIPTIONS['user']))
@@ -221,6 +244,15 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_orders(self, info, query=None, **kwargs):
         return resolve_orders(info, query)
+
+    def resolve_payment_method(self, info, id):
+        return graphene.Node.get_node_from_global_id(info, id, PaymentMethod)
+
+    def resolve_payment_client_token(self, info, customer_id=None):
+        return resolve_payment_client_token(customer_id)
+
+    def resolve_payments(self, info, query=None, **kwargs):
+        return resolve_payments(info, query)
 
     def resolve_product(self, info, id):
         return graphene.Node.get_node_from_global_id(info, id, Product)
@@ -346,6 +378,8 @@ class Mutations(graphene.ObjectType):
     attribute_delete = AttributeDelete.Field()
     attribute_update = AttributeUpdate.Field()
 
+    payment_transaction_create = CompleteCheckoutWithCreditCard.Field()
+
     product_create = ProductCreate.Field()
     product_delete = ProductDelete.Field()
     product_update = ProductUpdate.Field()
@@ -382,9 +416,6 @@ class Mutations(graphene.ObjectType):
     shipping_price_create = ShippingPriceCreate.Field()
     shipping_price_delete = ShippingPriceDelete.Field()
     shipping_price_update = ShippingPriceUpdate.Field()
-
-    variant_image_assign = VariantImageAssign.Field()
-    variant_image_unassign = VariantImageUnassign.Field()
 
 
 schema = graphene.Schema(Query, Mutations)
