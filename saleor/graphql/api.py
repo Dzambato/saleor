@@ -40,7 +40,9 @@ from .page.types import Page
 from .page.mutations import PageCreate, PageDelete, PageUpdate
 from .payment.types import PaymentGatewayEnum, PaymentMethod
 from .payment.resolvers import resolve_payment_methods, resolve_payment_client_token
-from .payment.mutations import CheckoutPaymentMethodCreate, PaymentMethodCharge
+from .payment.mutations import (
+    CheckoutPaymentMethodCreate, PaymentMethodCharge, PaymentMethodRefund,
+    PaymentMethodVoid)
 from .product.filters import ProductFilterSet
 from .product.mutations.attributes import (
     AttributeValueCreate, AttributeValueDelete,
@@ -394,6 +396,8 @@ class Mutations(graphene.ObjectType):
     attribute_update = AttributeUpdate.Field()
 
     payment_method_charge = PaymentMethodCharge.Field()
+    payment_method_refund = PaymentMethodRefund.Field()
+    payment_method_void = PaymentMethodVoid.Field()
 
     payment_transaction_create = CompleteCheckoutWithCreditCard.Field() # FIXME
 
