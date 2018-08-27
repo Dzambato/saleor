@@ -68,7 +68,6 @@ from .shipping.types import ShippingZone
 from .shipping.mutations import (
     ShippingZoneCreate, ShippingZoneDelete, ShippingZoneUpdate,
     ShippingPriceCreate, ShippingPriceDelete, ShippingPriceUpdate)
-from .utils import get_node
 from .checkout.types import CheckoutLine, Checkout
 from .checkout.mutations import (
     CheckoutCreate, CheckoutLinesAdd, CheckoutLinesUpdate, CheckoutLineDelete,
@@ -203,7 +202,7 @@ class Query(graphene.ObjectType):
         return resolve_categories(info, level=level, query=query)
 
     def resolve_checkout_line(self, info, id):
-        return get_node(info, id, only_type=CheckoutLine)
+        return graphene.Node.get_node_from_global_id(info, id, CheckoutLine)
 
     def resolve_checkout_lines(self, info, query=None, **kwargs):
         return resolve_checkout_lines(info, query)
