@@ -300,7 +300,7 @@ class ProductDelete(ModelDeleteMutation):
         return user.has_perm('product.manage_products')
 
 
-class ProductVariantInput(graphene.InputObjectType):
+class ProductVariantPropertiesInput(graphene.InputObjectType):
     attributes = graphene.List(
         AttributeValueInput, required=False,
         description='List of attributes specific to this variant.')
@@ -392,7 +392,7 @@ class ProductVariantUpdate(ProductVariantCreate):
     class Arguments:
         id = graphene.ID(
             required=True, description='ID of a product variant to update.')
-        input = ProductVariantInput(
+        input = ProductVariantPropertiesInput(
             required=True,
             description='Fields required to update a product variant.')
 
