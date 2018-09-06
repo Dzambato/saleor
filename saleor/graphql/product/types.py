@@ -282,6 +282,21 @@ class ProductType(CountableDjangoObjectType):
         return self.product_attributes.prefetch_related('values')
 
 
+class ImageWithThumbnail(graphene.ObjectType):
+    url = graphene.String(
+        required=True,
+        description='The URL of the image.',
+        size=graphene.Int(description='Size of the image'))
+
+    class Meta:
+        description = 'Represents an image.'
+
+    def resolve_url(self, info, size=None):
+        if size:
+            return get_thumbnail(self, size)
+        return self.url
+
+
 class Collection(CountableDjangoObjectType):
     products = DjangoFilterConnectionField(
         Product, filterset_class=ProductFilterSet,
@@ -300,21 +315,6 @@ class Collection(CountableDjangoObjectType):
         user = info.context.user
         return products_with_details(
             user=user).filter(collections=self).distinct()
-
-
-class ImageWithThumbnail(graphene.ObjectType):
-    url = graphene.String(
-        required=True,
-        description='The URL of the image.',
-        size=graphene.Int(description='Size of the image'))
-
-    class Meta:
-        description = 'Represents an image.'
-
-    def resolve_url(self, info, size=None):
-        if size:
-            return get_thumbnail(self, size)
-        return self.url
 
 
 class Category(CountableDjangoObjectType):
