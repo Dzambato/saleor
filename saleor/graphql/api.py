@@ -108,14 +108,15 @@ class Query(graphene.ObjectType):
             description=DESCRIPTIONS['collection']),
         description='List of the shop\'s collections.')
     checkout = graphene.Field(
-        Checkout, description='Single checkout',
+        Checkout, description='Single checkout.',
         token=graphene.Argument(graphene.UUID))
     checkouts = DjangoFilterConnectionField(
-        Checkout, description='List of checkouts')
+        Checkout, description='List of checkouts.')
     checkout_lines = DjangoFilterConnectionField(
-        CheckoutLine, description='List of checkout lines')
-    checkout_line = graphene.Field(CheckoutLine, id=graphene.Argument(graphene.ID))
-
+        CheckoutLine, description='List of checkout lines.')
+    checkout_line = graphene.Field(
+        CheckoutLine, id=graphene.Argument(graphene.ID),
+        description='Single checkout line.')
     menu = graphene.Field(
         Menu, id=graphene.Argument(graphene.ID),
         name=graphene.Argument(graphene.String, description="Menu name."),
@@ -147,7 +148,7 @@ class Query(graphene.ObjectType):
     payment_client_token = graphene.Field(
         graphene.String, args={'gateway': PaymentGatewayEnum()})
     payments = DjangoFilterConnectionField(
-        PaymentMethod, description='List of payments')
+        PaymentMethod, description='List of payments methods.')
     product = graphene.Field(
         Product, id=graphene.Argument(graphene.ID),
         description='Lookup a product by ID.')
