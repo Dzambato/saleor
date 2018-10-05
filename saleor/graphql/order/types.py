@@ -202,7 +202,8 @@ class Order(CountableDjangoObjectType):
     @staticmethod
     def resolve_available_shipping_methods(obj, info):
         from .resolvers import resolve_shipping_methods
-        return resolve_shipping_methods(obj, info)
+        return resolve_shipping_methods(
+            obj, info, obj.get_subtotal().gross.amount)
 
     @staticmethod
     def resolve_lines(obj, info):

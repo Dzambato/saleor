@@ -28,7 +28,7 @@ def resolve_order(info, id):
     return None
 
 
-def resolve_shipping_methods(obj, info):
+def resolve_shipping_methods(obj, info, price):
     if not obj.is_shipping_required():
         return None
     if not obj.shipping_address:
@@ -36,5 +36,5 @@ def resolve_shipping_methods(obj, info):
 
     qs = shipping_models.ShippingMethod.objects
     return qs.applicable_shipping_methods(
-        price=obj.get_subtotal().gross.amount, weight=obj.get_total_weight(),
+        price=price, weight=obj.get_total_weight(),
         country_code=obj.shipping_address.country.code)
