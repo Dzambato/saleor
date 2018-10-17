@@ -35,7 +35,7 @@ def superuser_required(
 def index(request):
     paginate_by = 10
     orders_to_ship = Order.objects.to_ship().select_related(
-        'user').prefetch_related('lines', 'payments')
+        'user').prefetch_related('lines', 'payment_methods')
     payments = PaymentMethod.objects.filter(
         is_active=True, charge_status=ChargeStatus.NOT_CHARGED
     ).order_by('-created')
