@@ -6,7 +6,8 @@ from ...payment import ChargeStatus
 from ...product.templatetags.product_images import get_thumbnail
 from ..account.types import User
 from ..core.types.common import CountableDjangoObjectType
-from ..core.types.money import Money, TaxedMoney, _str_to_enum
+from ..core.types.money import Money, TaxedMoney
+from ..core.utils import str_to_enum
 from ..shipping.types import ShippingMethod
 
 OrderEventsEnum = graphene.Enum.from_enum(OrderEvents)
@@ -14,7 +15,7 @@ OrderEventsEmailsEnum = graphene.Enum.from_enum(OrderEventsEmails)
 PaymentStatusEnum = graphene.Enum(
     'PaymentStatusEnum',
     [
-        (_str_to_enum(code.upper()), code)
+        (str_to_enum(code.upper()), code)
         for code, name in ChargeStatus.CHOICES])
 
 

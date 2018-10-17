@@ -415,8 +415,6 @@ class Mutations(graphene.ObjectType):
     payment_method_refund = PaymentMethodRefund.Field()
     payment_method_void = PaymentMethodVoid.Field()
 
-    payment_transaction_create = CompleteCheckoutWithCreditCard.Field() # FIXME
-
     product_create = ProductCreate.Field()
     product_delete = ProductDelete.Field()
     product_update = ProductUpdate.Field()
