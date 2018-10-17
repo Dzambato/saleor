@@ -1,19 +1,21 @@
 import graphene
 from graphene import relay
-from payments import PaymentStatus
 
 from ...order import OrderEvents, OrderEventsEmails, models
+from ...payment import ChargeStatus
 from ...product.templatetags.product_images import get_thumbnail
 from ..account.types import User
 from ..core.types.common import CountableDjangoObjectType
-from ..core.types.money import Money, TaxedMoney
+from ..core.types.money import Money, TaxedMoney, _str_to_enum
 from ..shipping.types import ShippingMethod
 
 OrderEventsEnum = graphene.Enum.from_enum(OrderEvents)
 OrderEventsEmailsEnum = graphene.Enum.from_enum(OrderEventsEmails)
 PaymentStatusEnum = graphene.Enum(
     'PaymentStatusEnum',
-    [(code.upper(), code) for code, name in PaymentStatus.CHOICES])
+    [
+        (_str_to_enum(code.upper()), code)
+        for code, name in ChargeStatus.CHOICES])
 
 
 class OrderEvent(CountableDjangoObjectType):
@@ -153,16 +155,17 @@ class Order(CountableDjangoObjectType):
 
     @staticmethod
     def resolve_total_authorized(obj, info):
+        # FIXME adjust to multiple payments
         payment = obj.get_last_payment()
         if payment:
-            return payment.get_total().gross
+            return payment.total.gross
 
     @staticmethod
     def resolve_total_captured(obj, info):
-        payment = obj.get_last_payment()
         # FIXME adjust to multiple payments
+        payment = obj.get_last_payment()
         if payment:
-            return payment.get_captured_money()
+            return payment.captured_amount
 
     @staticmethod
     def resolve_fulfillments(obj, info):
